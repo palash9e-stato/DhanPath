@@ -1,0 +1,136 @@
+{
+  "name": "workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e2343af7-cf63-425f-ba17-ea12de551100",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "appBSrTeNyejLTuST",
+          "mode": "list",
+          "cachedResultName": "Untitled Base",
+          "cachedResultUrl": "https://airtable.com/appBSrTeNyejLTuST"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl8y2JcN4rFfRoKX",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appBSrTeNyejLTuST/tbl8y2JcN4rFfRoKX"
+        },
+        "id": "rec9GOQSl2RSV7U8N",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0da3cbd8-3ae6-468e-8cfd-1aa265a760c0",
+      "name": "Get a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "ATIrSYGof6ZhdqY6",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a business analyst.\nBased on the following data, predict company performance as High, Medium, or Low.\n\nName: {{ $json.Name }}\nRevenue: {{$json.Revenue}} lakhs\nEmployees: {{$json.Employees}} persons\nGrowth Rate: {{$json.GrowthRate }} %\n\nReturn only the prediction.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c768b3f5-10ab-44d7-9448-15c53ca1d6ae",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "c8417e19-b2ec-4630-98d5-6dff6d275bbe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "tqYM8o7VFZzBAXFf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a record": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4d4e94d8-e303-4aba-b73a-d64982bb6ad3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0975b8426a749ebfedb182353ba9e771a7c8afdff564d2c2731a9b6c2313f330"
+  },
+  "id": "Jgxd8NJ9eCR4uLGV",
+  "tags": []
+}

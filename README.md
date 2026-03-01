@@ -137,33 +137,7 @@ Profile is wired directly to Clerk's user management API. Users can update their
 
 ---
 
-## 🪲 The Real Challenges — And How I Solved Them
 
-### Challenge 1 — Python venv Path on Windows PowerShell
-Running `.\venv\Scripts\pip` in PowerShell from a different working directory caused a "not recognized" error. Windows path resolution doesn't inherit the correct scope when chaining `cd` and `.\` in a single command.
-**Fix:** Used absolute paths (`& "C:\...\venv\Scripts\python.exe"`) and the PowerShell call operator `&` to invoke executables correctly.
-
-### Challenge 2 — Pip Dependency Backtracking (45+ minutes)
-Installing `langchain_community` + `google-generativeai` + `grpcio` together triggered pip's backtracking resolver — it tried hundreds of version combinations for `googleapis-common-protos` and `grpcio-status` before finding a compatible set.
-**Fix:** Ran the install as a background process and waited. No pinning needed — pip eventually resolved it. Added a note to pin versions for future `requirements.txt` updates.
-
-### Challenge 3 — Clerk Not Redirecting After Login
-After sign-in, users stayed on the auth page instead of going to `/portfolio`. Three bugs were stacked:
-- `ClerkProvider` was **outside** `<Router>`, so Clerk had no access to React Router's navigate function
-- `redirectUrl` and `afterSignInUrl` props were **deprecated** in newer Clerk versions
-- `/sign-in/sso-callback` route was **missing** (only sign-up SSO was handled, breaking Google login)
-
-**Fix:** Moved `ClerkProvider` inside the router, passed `navigate={(to) => navigate(to)}` to give Clerk routing access, replaced props with `forceRedirectUrl`/`fallbackRedirectUrl`, and added the missing SSO callback route.
-
-### Challenge 4 — Gemini API Deprecation Warning
-`google.generativeai` package showed a `FutureWarning` on every startup: *"All support has ended"*. The app still works, but it's a flag.
-**Status:** Noted. The migration path is to switch to `google.genai` (the new SDK). Not blocking for now.
-
-### Challenge 5 — Financial Path JSON Parsing Failures
-Gemini sometimes returned the JSON wrapped in markdown code fences, sometimes bare, and occasionally with trailing text. A plain `json.loads(response.text)` would crash on the wrapped versions.
-**Fix:** A two-stage parser — regex extracts content between ` ```json ``` ` tags first; if that fails, tries direct JSON parse of the entire response.
-
----
 
 ## 🔐 Security Decisions
 
@@ -262,6 +236,4 @@ VITE_GNEWS_API_KEY=your_gnews_key
 | HTTP Client | Axios | Promise-based, interceptors |
 
 ---
-
-*Built with curiosity, a lot of debugging, and the belief that financial clarity should be accessible to everyone — not just those who can afford a personal advisor.*
 
